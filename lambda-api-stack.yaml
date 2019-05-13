@@ -107,7 +107,7 @@ Resources:
                 Resource:
                   # this creates a circular reference - !GetAtt "lambdaLogGroup.Arn"
                   "*"
-          PolicyName: "lambda"
+          PolicyName: "LambdaAllowedToWriteLogs"
 
   # set up per @see https://stackoverflow.com/questions/39231592/specify-log-group-for-an-aws-lambda
   lambdaLogGroup:
