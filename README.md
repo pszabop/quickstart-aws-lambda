@@ -11,3 +11,8 @@ with the following properties:
    will tell you how often snippets fail to tell the whole story
 
 This should give you a good start at creating an AWS sandbox to test Lambda code
+
+# Instructions
+
+1. Set up AWS CLI per [AWS instructions](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
+1. run lambda-api-test.sh.  This should deploy the CloudFormation stack template, test its API, and delete the stack
