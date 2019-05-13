@@ -1,6 +1,8 @@
 # This was copied from @see https://bl.ocks.org/magnetikonline/c314952045eee8e8375b82bc7ec68e88#stack.yaml
+# No blame on that author, it's just what Google gave me.
+# Modified so that there are no name collisions and CloudFormation handles all deletion
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "My API Gateway and Lambda function"
+Description: "Example API Gateway and Lambda function"
 
 Parameters:
   apiGatewayStageName:
@@ -8,15 +10,18 @@ Parameters:
     AllowedPattern: "^[a-z0-9]+$"
     Default: "call"
 
-  lambdaFunctionName:
-    Type: "String"
-    AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
-    Default: "my-function"
+  # Lambda function name removed because in order to avoid collisions CloudFormation
+  # should name things for you.
+  #lambdaFunctionName:
+    #Type: "String"
+    #AllowedPattern: "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$"
+    #Default: "my-function"
 
 Resources:
   apiGateway:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
+      # should have cloudformation auto-name-it
       Name: "my-api"
       Description: "My API"
 
@@ -42,12 +47,15 @@ Resources:
       RestApiId: !Ref "apiGateway"
       StageName: !Ref "apiGatewayStageName"
 
+  # TBD add environment variables.  
+  # TBD how should we pass in sensitive materials via environment variables?  Some other method?  IAM role?
   lambdaFunction:
     Type: "AWS::Lambda::Function"
     Properties:
       Code:
         ZipFile: |
           def handler(event,context):
+            print 'Hello There'
             return {
               'body': 'Hello there {0}'.format(event['requestContext']['identity']['sourceIp']),
               'headers': {
@@ -56,7 +64,9 @@ Resources:
               'statusCode': 200
             }
       Description: "My function"
-      FunctionName: !Ref "lambdaFunctionName"
+      # Specifying the function name forces the client to handle namespace collisions
+      # Letting CloudFormation do it automates this away.
+      #FunctionName: !Ref "lambdaFunctionName"
       Handler: "index.handler"
       MemorySize: 128
       Role: !GetAtt "lambdaIAMRole.Arn"
@@ -92,14 +102,21 @@ Resources:
                   - "logs:PutLogEvents"
                 Effect: "Allow"
                 Resource:
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionName}:*"
+                  # this creates a circular reference - !GetAtt "lambdaLogGroup.Arn"
+                  "*"
           PolicyName: "lambda"
 
+  # set up per @see https://stackoverflow.com/questions/39231592/specify-log-group-for-an-aws-lambda
   lambdaLogGroup:
+    DependsOn: "lambdaFunction"
     Type: "AWS::Logs::LogGroup"
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${lambdaFunctionName}"
-      RetentionInDays: 90
+      RetentionInDays: 7
+      LogGroupName:
+        Fn::Join:
+        - ''
+        - - "/aws/lambda/"
+          - Ref: lambdaFunction
 
 Outputs:
   apiGatewayInvokeURL:
