@@ -21,9 +21,12 @@ Resources:
   apiGateway:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
-      # should have cloudformation auto-name-it
-      Name: "my-api"
-      Description: "My API"
+      # should have cloudformation auto-name-it.  But it wont.
+      # So we'll just give it the name of our cloud formation template instance
+      # If for some reason we create more than one API under this stack then a name
+      # mangle will be required
+      Name: !Ref "AWS::StackName"
+      Description: !Ref "AWS::StackName"
 
   apiGatewayRootMethod:
     Type: "AWS::ApiGateway::Method"

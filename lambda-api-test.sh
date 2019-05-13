@@ -45,7 +45,6 @@ echo "testing completed"
 # Lessons learned
 #   @see https://github.com/hashicorp/terraform/issues/14750   (you can't delete the LogGroups every time because we gave permission for Lambda to create it as needed)
 #
-#sleep 30 # Try to flush the logs.  XXX fix this in the template per the hashicorp note)
 aws cloudformation delete-stack --stack-name ${stack_name}
 echo "Waiting for stack ${stack_name} to be deleted.  This could take 30-300 seconds depending on the stack.  No progress feedback provided, sorry"
 aws cloudformation wait stack-delete-complete  --stack-name ${stack_name}
