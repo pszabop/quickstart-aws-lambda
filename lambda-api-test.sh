@@ -7,7 +7,8 @@
 #
 
 # define a few required variables
-stack_name="lambda-test-api-gw"
+stack_name=${1:-"lambda-test-api-gw"}
+
 
 # Step 1:  Publish Stack. Entire stack (including Lambda code) is in a YAML file.  (Normally the code would be in an S3 bucket requiring an extra step)
 #
