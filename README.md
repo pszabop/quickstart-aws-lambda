@@ -14,6 +14,7 @@ This should give you a good start at creating an AWS sandbox to test Lambda code
 
 # Instructions
 
+1. Install the `jq` [utility](https://stedolan.github.io/jq/). On a MAC this would be `brew install jq`.  On Linux it depends on your distro but is a similar command.
 1. Set up AWS CLI per [AWS instructions](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
 1. run lambda-api-test.sh.  This should deploy the CloudFormation stack template, test its API, and delete the stack
 
